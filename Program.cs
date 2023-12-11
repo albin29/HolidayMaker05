@@ -1,1 +1,5 @@
-﻿namespace HolidayMaker05;
+﻿using HolidayMaker05;
+
+Admin admin = new Admin();
+
+admin.Menu();

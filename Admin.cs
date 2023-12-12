@@ -15,8 +15,8 @@ public class Admin
             Console.Clear();
             Console.WriteLine("Welcome to our Holidaymaker");
 
-            Console.WriteLine("1 - See available rooms");
-            Console.WriteLine("2 - See all rooms");
+            Console.WriteLine("1 - Booking");
+            Console.WriteLine("2 - Alter room");
             Console.WriteLine("3 - See all customers\n");
 
             Console.WriteLine("0 - Exit menu");

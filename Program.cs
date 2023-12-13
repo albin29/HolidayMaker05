@@ -11,18 +11,18 @@ admin.Menu();
 
 async Task ActivateTables()
 { 
-    string qHotels = @"create table if not exists hotel(
+    string qHotels = @"create table if not exists hotels(
     hotel_id                serial primary key,
     name                    text,
     rating                  int);";
 
-    string qRooms = @"create table if not exists room(
+    string qRooms = @"create table if not exists rooms(
     room_id                 serial primary key,
     number                  int,
     beds                    int,
     price                   int);";
 
-    string qGuests = @"create table if not exists guest(
+    string qGuests = @"create table if not exists guests(
     guest_id                serial primary key,
     name                    text,
     last_name               text, 
@@ -32,37 +32,38 @@ async Task ActivateTables()
     string qLocations = @"create table if not exists locations(
     location_id             serial primary key,
     name                    text,
-    location_id             serial references locations (location_id)),
     distance_from_central   int,
     distance_from_beach     int);";
 
-    string qReservations = @"create table if not exists reservation (
+    string qReservations = @"create table if not exists reservations (
     reservation_id          serial primary key,
-    constraint              hotel_id foreign key(hotel)         references hotel(hotel_id),
-    constraint              room_id foreign key(room)           references room(room_id),
-    constraint              guest_id foreign key(guest)         references guest(guest_id),
+    hotel_id                int references hotels (hotel_id),
+    room_id                 int references rooms(room_id),
+    guest_id                int references guests(guest_id),
     starting_date           date,
     ending_date             date);";
 
     string qRoomAddons = @"create table if not exists room_addons(
-    room_id                 room_id foreign(room)               references room(room_id),
-    balcony                 bool
-    ac                      bool
-    jacuzzi                 bool
-    smart_tv                bool);";
+    room_addon_id           serial primary key,
+    room_id                 int references rooms(room_id),
+    balcony                 boolean,
+    ac                      boolean,
+    jacuzzi                 boolean,
+    smart_tv                boolean);";
 
     string qHotelAddons = @"create table if not exists hotel_addons(
-    room_id                 room_id foreign(room)               references room(room_id),
-    live_performance        bool
-    pool                    bool
-    childrens_club          bool
-    restaurant              bool);";
+    hotel_addons_id         serial primary key,
+    hotel_id                int references hotels (hotel_id),
+    live_performance        boolean,
+    pool                    boolean,
+    childrens_club          boolean,
+    restaurant              boolean);";
 
     await db.CreateCommand(qHotels).ExecuteNonQueryAsync();
     await db.CreateCommand(qRooms).ExecuteNonQueryAsync();
     await db.CreateCommand(qLocations).ExecuteNonQueryAsync();
     await db.CreateCommand(qRoomAddons).ExecuteNonQueryAsync();
     await db.CreateCommand(qHotelAddons).ExecuteNonQueryAsync();
-    await db.CreateCommand(qReservations).ExecuteNonQueryAsync();
     await db.CreateCommand(qGuests).ExecuteNonQueryAsync();
-}
+    await db.CreateCommand(qReservations).ExecuteNonQueryAsync();
+    }

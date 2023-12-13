@@ -11,18 +11,18 @@ admin.Menu();
 
 async Task ActivateTables()
 { 
-    string qHotels = @"create table if not exists hotel (
+    string qHotels = @"create table if not exists hotel(
     hotel_id                serial primary key,
     name                    text,
-    rating                  int;)";
+    rating                  int);";
 
-    string qRooms = @"create table if not exists room (
+    string qRooms = @"create table if not exists room(
     room_id                 serial primary key,
     number                  int,
     beds                    int,
-    price                   int;)";
+    price                   int);";
 
-    string qGuests = @"create table if not exists guest (
+    string qGuests = @"create table if not exists guest(
     guest_id                serial primary key,
     name                    text,
     last_name               text, 
@@ -34,7 +34,7 @@ async Task ActivateTables()
     name                    text,
     location_id             serial references locations (location_id)),
     distance_from_central   int,
-    distance_from_beach     int;";
+    distance_from_beach     int);";
 
     string qReservations = @"create table if not exists reservation (
     reservation_id          serial primary key,
@@ -49,7 +49,7 @@ async Task ActivateTables()
     balcony                 bool
     ac                      bool
     jacuzzi                 bool
-    smart_tv                bool)";
+    smart_tv                bool);";
 
     string qHotelAddons = @"create table if not exists hotel_addons(
     room_id                 room_id foreign(room)               references room(room_id),

@@ -36,18 +36,26 @@ public class Booking
                 case "4":
                     exit = true;
                     break;
-                    
-
-
-
             }
 
-
-
-
-
-
         }
+
+    }
+    public void Reservation() {
+        Console.WriteLine("What is the customers information?");
+        Console.WriteLine("Which days do you want to reserve?");
+        // Visa alla rum som är tillgängliga
+        Console.WriteLine("Which hotel would you like to stay at?");
+        //Print all hotels
+        //customer väljer ett hotell
+        Console.WriteLine("How many beds would you like?");
+        //show all rooms with amounts of bed
+         
+        Console.WriteLine("Would you like to have any addons?");
+        // visa alla rum med kundens filter
+        
+        // boka in
+
 
 
 

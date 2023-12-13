@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace HolidayMaker05;
 public class Admin
 {
+    Booking booking = new Booking();
     public void Menu()
     {
         bool menu = true;
@@ -17,7 +18,7 @@ public class Admin
 
             Console.WriteLine("1 - Booking");
             Console.WriteLine("2 - Alter room");
-            Console.WriteLine("3 - See all customers\n");
+            Console.WriteLine("3 - Searches");
 
             Console.WriteLine("0 - Exit menu");
 
@@ -26,13 +27,14 @@ public class Admin
             switch (pick)
             {
                 case "1":
+                    booking.Book();
                     break;
                 case "2":
                     break;
+                
+
                 case "3":
-                    Console.Clear();
-                    Console.WriteLine("All customers: ");
-                    Console.ReadKey();
+                   
                     break;
                 case "0":
                     menu = false;

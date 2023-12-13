@@ -10,17 +10,20 @@ Admin admin = new Admin();
 admin.Menu();
 
 async Task ActivateTables()
-{ 
+{
     string qHotels = @"create table if not exists hotels(
     hotel_id                serial primary key,
     name                    text,
-    rating                  int);";
+    rating                  int,
+    location_id             int references locations(location_id),
+    hotel_addons            int references hotel_addons(hotel_addons_id));";
 
     string qRooms = @"create table if not exists rooms(
     room_id                 serial primary key,
     number                  int,
     beds                    int,
-    price                   int);";
+    price                   int,
+    room_addon_id           int references room_addons(room_addon_id));";
 
     string qGuests = @"create table if not exists guests(
     guest_id                serial primary key,
@@ -45,7 +48,6 @@ async Task ActivateTables()
 
     string qRoomAddons = @"create table if not exists room_addons(
     room_addon_id           serial primary key,
-    room_id                 int references rooms(room_id),
     balcony                 boolean,
     ac                      boolean,
     jacuzzi                 boolean,
@@ -53,17 +55,16 @@ async Task ActivateTables()
 
     string qHotelAddons = @"create table if not exists hotel_addons(
     hotel_addons_id         serial primary key,
-    hotel_id                int references hotels (hotel_id),
     live_performance        boolean,
     pool                    boolean,
     childrens_club          boolean,
     restaurant              boolean);";
 
+    await db.CreateCommand(qLocations).ExecuteNonQueryAsync();
+    await db.CreateCommand(qHotelAddons).ExecuteNonQueryAsync();
+    await db.CreateCommand(qRoomAddons).ExecuteNonQueryAsync();
     await db.CreateCommand(qHotels).ExecuteNonQueryAsync();
     await db.CreateCommand(qRooms).ExecuteNonQueryAsync();
-    await db.CreateCommand(qLocations).ExecuteNonQueryAsync();
-    await db.CreateCommand(qRoomAddons).ExecuteNonQueryAsync();
-    await db.CreateCommand(qHotelAddons).ExecuteNonQueryAsync();
     await db.CreateCommand(qGuests).ExecuteNonQueryAsync();
     await db.CreateCommand(qReservations).ExecuteNonQueryAsync();
     }

@@ -20,6 +20,7 @@ public class Book
         bool exit = false;
         while (exit)
         {
+            Console.Clear();
             Console.WriteLine("What would you like to book?");
 
             Console.WriteLine("1 - Make a full reservation");

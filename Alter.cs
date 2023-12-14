@@ -22,7 +22,7 @@ public class Alter
 
         while (open)
         {
-
+            Console.Clear();
             Console.WriteLine("What would you like to alter?");
 
             string pick = Console.ReadLine();
@@ -36,8 +36,6 @@ public class Alter
                     open = false;
                     break;
             }
-
-
         }
     }
     public async Task<string> Name()

@@ -20,6 +20,7 @@ public class SearchPage
         bool open = true;
         while (open)
         {
+            Console.Clear();
             Console.WriteLine("1 - See hotels locations");
             Console.WriteLine("2 - Sort after reviews");
             Console.WriteLine("Search with sort by price");

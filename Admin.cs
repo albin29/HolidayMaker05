@@ -3,12 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Npgsql;
 
 namespace HolidayMaker05;
 public class Admin
 {
-    Booking booking = new Booking();
-    public void Menu()
+    private readonly NpgsqlDataSource _db;
+    Book book;
+    Alter alter;
+    SearchPage searchPage;
+
+    public Admin(NpgsqlDataSource db)
+    {
+        _db = db;
+        book = new Book(db);
+        alter = new Alter(db);
+        searchPage = new SearchPage(db);
+
+    }
+    public async Task Menu()
     {
         bool menu = true;
         while (menu)
@@ -22,22 +35,16 @@ public class Admin
 
             Console.WriteLine("0 - Exit menu");
 
-
             string pick = Console.ReadLine();
             switch (pick)
             {
-                case "1":
-                    booking.Book();
+                case "1": book.Open();
                     break;
-                case "2":
+                case "2": await alter.Open();
                     break;
-                
-
-                case "3":
-                   
+                case "3": searchPage.Open();
                     break;
-                case "0":
-                    menu = false;
+                case "0": menu = false;
                     break;
             }
         }

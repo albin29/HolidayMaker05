@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Npgsql;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,9 +8,14 @@ using System.Threading.Tasks;
 
 namespace HolidayMaker05;
 
-public class Booking
+public class Book
 {
-    public void Book()
+    private readonly NpgsqlDataSource _db;
+    public Book(NpgsqlDataSource db)
+    {
+        _db = db;
+    }
+    public void Open()
     {
         bool exit = false;
         while (exit)
@@ -26,6 +32,7 @@ public class Booking
             {
                 case "1":
                     Console.WriteLine("");
+                    Reservation();
                     break;
                 case "2":
                     Console.WriteLine("");

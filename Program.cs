@@ -5,7 +5,7 @@ const string dbUri = "Host=localhost;Port=5455;Username=postgres;Password=postgr
 await using var db = NpgsqlDataSource.Create(dbUri);
 
 await ActivateTables();
-Admin admin = new Admin();
+Admin admin = new Admin(db);
 
 admin.Menu();
 

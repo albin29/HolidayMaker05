@@ -7,7 +7,7 @@ await using var db = NpgsqlDataSource.Create(dbUri);
 await ActivateTables();
 Admin admin = new Admin(db);
 
-admin.Menu();
+await admin.Menu();
 
 async Task ActivateTables()
 {
@@ -30,7 +30,7 @@ async Task ActivateTables()
     name                    text,
     last_name               text, 
     email                   text, 
-    phone_number            int);";
+    phone_number            text);";
 
     string qLocations = @"create table if not exists locations(
     location_id             serial primary key,

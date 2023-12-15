@@ -15,7 +15,7 @@ public class Book
     {
         _db = db;
     }
-    public void Open()
+    public async Task Open()
     {
         bool exit = false;
         while (exit)
@@ -50,7 +50,7 @@ public class Book
 
     }
 
-    public void Book_Customer()
+    public async Task Book_Customer()
     {
         Console.WriteLine("What is the customers full name?");
         string full_name = Console.ReadLine();
@@ -62,12 +62,13 @@ public class Book
         string starting_date = Console.ReadLine();
         Console.WriteLine("What is the endingDate ?");
         string ending_date = Console.ReadLine();
+        await RegisterReservation(Convert.ToInt32(room_id), full_name, email, starting_date, ending_date);
     }
 
-    public async Task RegisterReservation(string room_id, string full_name, string email, string starting_date, string ending_date)
+    public async Task RegisterReservation(int room_id, string full_name, string email, string starting_date, string ending_date)
     {
         string insertQuery = @"
-        INSERT INTO reservations (room_id, full_name, starting_date, ending_date)
+        INSERT INTO reservations (room_id, full_name,email, starting_date, ending_date)
         VALUES (@room_id, @full_name, @email, @starting_date, @ending_date)";
 
         await using var cmd = _db.CreateCommand(insertQuery);
@@ -75,8 +76,8 @@ public class Book
         cmd.Parameters.AddWithValue("room_id", room_id);
         cmd.Parameters.AddWithValue("full_name", full_name);
         cmd.Parameters.AddWithValue("email", email);
-        cmd.Parameters.AddWithValue("starting_date", starting_date);
-        cmd.Parameters.AddWithValue("starting_date", ending_date);
+        cmd.Parameters.AddWithValue("starting_date", DateTime.Parse(starting_date));
+        cmd.Parameters.AddWithValue("ending_date", DateTime.Parse(ending_date));
 
         await cmd.ExecuteNonQueryAsync();
     }

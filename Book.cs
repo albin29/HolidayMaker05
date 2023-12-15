@@ -15,7 +15,7 @@ public class Book
     {
         _db = db;
     }
-    public void Open()
+    public async Task Open()
     {
         bool exit = false;
         while (exit)
@@ -49,7 +49,7 @@ public class Book
         }
 
     }
-    public void Reservation() {
+    public async Task Reservation() {
         Console.WriteLine("What is the customers information?");
         Console.WriteLine("Which days do you want to reserve?");
         // Visa alla rum som är tillgängliga

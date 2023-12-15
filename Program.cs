@@ -12,7 +12,7 @@ await using var db = NpgsqlDataSource.Create(dbUri);
 await ActivateTables();
 Admin admin = new Admin(db);
 
-admin.Menu();
+await admin.Menu();
 
 async Task ActivateTables()
 {

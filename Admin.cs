@@ -8,6 +8,7 @@ using Npgsql;
 namespace HolidayMaker05;
 public class Admin
 {
+    RegisterUser registeruser;
     private readonly NpgsqlDataSource _db;
     Book book;
     Alter alter;
@@ -19,7 +20,7 @@ public class Admin
         book = new Book(db);
         alter = new Alter(db);
         searchPage = new SearchPage(db);
-
+        registeruser = new RegisterUser(db);
     }
     public async Task Menu()
     {
@@ -32,7 +33,7 @@ public class Admin
             Console.WriteLine("1 - Booking");
             Console.WriteLine("2 - Alter room");
             Console.WriteLine("3 - Searches");
-
+            Console.WriteLine("4 - Register user");
             Console.WriteLine("0 - Exit menu");
 
             string pick = Console.ReadLine();
@@ -43,6 +44,11 @@ public class Admin
                 case "2": await alter.Open();
                     break;
                 case "3": searchPage.Open();
+                    break;
+                case "4":
+                    await registeruser.RegisterMenu();
+
+
                     break;
                 case "0": menu = false;
                     break;

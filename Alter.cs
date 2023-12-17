@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,15 +23,17 @@ public class Alter
         Console.Clear();
         Console.WriteLine("Enter Email\n");
 
-        string email = Console.ReadLine();
+        string? email = Console.ReadLine();
         Console.Clear();
-        await Preview(email);
 
+        if (!await Preview(email))
+        {
+           return;
+        }
         Console.WriteLine("What about your reservation would you like to alter?");
-        Console.WriteLine("1 - The date");
-        Console.WriteLine("2 - The room");
+        Console.WriteLine("1 - The date\n2 - The room\n3 - Browse\n\n0 - Exit");
 
-        string pick = Console.ReadLine();
+        string? pick = Console.ReadLine();
 
         switch (pick)
         {
@@ -40,25 +43,34 @@ public class Alter
             case "2":
                 await Room(email);
                 break;
+            case "3": await Browse();
+                break;
+            case "0": 
+                break;
         }
-
-
         //DELETE FROM Customers WHERE CustomerName='Alfreds Futterkiste';
     }
-    public async Task Date(string date)
+    public async Task Date(string email)
     {
         Console.Clear();
-        Console.WriteLine("What are the dates you would like to have instead?");
+        Console.WriteLine("What are the dates you would like to have instead?\nFormat XXXX/XX/XX");
 
         string startingDate = Console.ReadLine();
         string endingDate = Console.ReadLine();
 
-        string qDate = $@"UPDATE reservations
-        SET reservation.starting_date = {startingDate}
-        WHERE email = {date};
+        string qDate = @"
         UPDATE reservations
-        SET reservation.ending_date = {startingDate}
-        WHERE email = {date};";
+        SET starting_date = @startingDate
+        WHERE email = @email;
+        UPDATE reservations
+        SET ending_date = @endingDate
+        WHERE email = @email;";
+
+        await using var cmd = _db.CreateCommand(qDate);
+        cmd.Parameters.AddWithValue("startingDate", DateTime.Parse(startingDate));
+        cmd.Parameters.AddWithValue("endingDate", DateTime.Parse(endingDate));
+        cmd.Parameters.AddWithValue("email", email);
+        await cmd.ExecuteNonQueryAsync();
     }
     public async Task Room(string email)
     {
@@ -67,7 +79,8 @@ public class Alter
 
         int room = Convert.ToInt32(Console.ReadLine());
 
-        string qRoom = $@"UPDATE reservations
+        string qRoom = @"
+        UPDATE reservations
         SET room_id = @room
         WHERE email = @email;";
 
@@ -83,13 +96,13 @@ public class Alter
         Console.ReadKey();
 
     }
-    public async Task Preview(string email)
+    public async Task<bool> Preview(string email)
     {
 
         string qEmail = @"
         SELECT room_id, full_name, email, starting_date, ending_date
         FROM reservations
-        WHERE email = @Email;";
+        WHERE email = @email;";
 
         string result = string.Empty;
 
@@ -111,7 +124,123 @@ public class Alter
             result += reader.GetDateTime(4);
             result += "\n";
         }
-        Console.WriteLine(result);
 
+        if (result == string.Empty)
+        {
+            await Console.Out.WriteLineAsync("Sorry couldn't find a match");
+            Console.ReadKey();
+            return false;
+        }
+        Console.WriteLine(result);
+        return true;
+    }
+    public async Task Browse()
+    {
+        await Hotel();
+
+        Console.WriteLine("Which hotel would you like?");
+        int hotelID = Convert.ToInt32(Console.ReadLine());
+
+        await Rooms(hotelID);
+
+    }
+    public async Task Rooms(int hotelID)
+    {
+        Console.Clear();
+
+        string qRooms = @"
+        SELECT rooms.room_id, rooms.number, rooms.beds, price, room_addons.balcony, room_addons.ac,
+        room_addons.jacuzzi, room_addons.smart_tv
+        FROM rooms
+        LEFT JOIN room_addons ON rooms.room_addon_id = room_addons.room_addon_id
+        WHERE rooms.hotel_id = @hotelid";
+        string result = string.Empty;
+
+        using var command = _db.CreateCommand(qRooms);
+        command.Parameters.AddWithValue("hotelid", hotelID);
+
+        var reader = await command.ExecuteReaderAsync();
+
+        Console.WriteLine("ID Number Beds Price Balcony AC Jacuzzi SmartTV");
+        while (await reader.ReadAsync())
+        {
+            result += reader.GetInt32(0);
+            result += " | ";
+            result += reader.GetInt32(1);
+            result += " | ";
+            result += reader.GetInt32(2);
+            result += " | ";
+            result += reader.GetInt32(3);
+            result += "      ";
+            result += reader.GetBoolean(4);
+            result += " ";
+            result += reader.GetBoolean(5);
+            result += " ";
+            result += reader.GetBoolean(6);
+            result += " ";
+            result += reader.GetBoolean(7);
+            result += "\n";
+        }
+
+        if (result == string.Empty)
+        {
+            await Console.Out.WriteLineAsync("Sorry couldn't find a match");
+            Console.ReadKey();
+        }
+        Console.WriteLine(result);
+        Console.ReadKey();
+    }
+
+    public async Task Hotel()
+    {
+        Console.Clear();
+
+        string qHotels = @"
+        SELECT hotels.hotel_id, hotels.name, hotels.rating, locations.distance_from_central,
+        locations.distance_from_beach, hotel_addons.live_performance, 
+        hotel_addons.pool, hotel_addons.childrens_club, hotel_addons.restaurant, locations.address
+        FROM hotels
+        LEFT JOIN locations ON locations.location_id = hotels.location_id
+        LEFT JOIN hotel_addons ON hotel_addons.hotel_addon_id = hotels.hotel_addon_id;";
+
+        string result = string.Empty;
+
+        using var command = _db.CreateCommand(qHotels);
+
+        var reader = await command.ExecuteReaderAsync();
+
+        Console.WriteLine("ID Name Rating dBeach dCentral LiveP Pool ChildrensC Restaurant Address ");
+        while (await reader.ReadAsync())
+        {
+            result += "[";
+            result += reader.GetInt32(0);
+            result += ", ";
+            result += reader.GetString(1);
+            result += ", ";
+            result += reader.GetInt32(2);
+            result += ", ";
+            result += reader.GetFloat(3);
+            result += "KM, ";
+            result += reader.GetFloat(4);
+            result += "KM, ";
+            result += reader.GetBoolean(5);
+            result += ", ";
+            result += reader.GetBoolean(6);
+            result += ", ";
+            result += reader.GetBoolean(7);
+            result += ", ";
+            result += reader.GetBoolean(8);
+            result += ", ";
+            result += reader.GetString(9);
+            result += "]\n";
+        }
+
+        if (result == string.Empty)
+        {
+            await Console.Out.WriteLineAsync("Sorry couldn't find a match");
+            Console.ReadKey();
+        }
+        Console.WriteLine(result);
+               
     }
 }

@@ -33,10 +33,10 @@ public class Book
             {
                 case "1":
                     Console.WriteLine("");
-                    Reservation();
+                    await Reservation();
                     break;
                 case "2":
-                    Book_Customer();
+                    await Book_Customer();
                     break;
                 case "3":
                     Console.WriteLine();
@@ -53,15 +53,15 @@ public class Book
     public async Task Book_Customer()
     {
         Console.WriteLine("What is the customers full name?");
-        string full_name = Console.ReadLine();
+        string? full_name = Console.ReadLine();
         Console.WriteLine("What is the userEmail?");
-        string email = Console.ReadLine();
+        string? email = Console.ReadLine();
         Console.WriteLine("What room to be reserved?");
-        string room_id = Console.ReadLine();
+        string? room_id = Console.ReadLine();
         Console.WriteLine("What is the startingDate ?");
-        string starting_date = Console.ReadLine();
+        string? starting_date = Console.ReadLine();
         Console.WriteLine("What is the endingDate ?");
-        string ending_date = Console.ReadLine();
+        string? ending_date = Console.ReadLine();
         await RegisterReservation(Convert.ToInt32(room_id), full_name, email, starting_date, ending_date);
     }
 
@@ -82,7 +82,7 @@ public class Book
         await cmd.ExecuteNonQueryAsync();
     }
 
-    public void Reservation() {
+    public async Task Reservation() {
 
 
         Console.WriteLine("What is the customers information?");

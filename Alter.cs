@@ -32,7 +32,7 @@ public class Alter
             return;
         }
         Console.WriteLine("What about your reservation would you like to alter?");
-        Console.WriteLine("1 - The date\n2 - The room\n3 - Browse\n\n0 - Exit");
+        Console.WriteLine("1 - The date\n2 - The room\n\n0 - Exit");
         string orderBy = string.Empty;
         string? pick = Console.ReadLine();
 

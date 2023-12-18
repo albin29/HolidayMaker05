@@ -17,7 +17,7 @@ public class Book
     }
     public async Task Open()
     {
-        bool exit = false;
+        bool exit = true;
         while (exit)
         {
             Console.Clear();
@@ -41,8 +41,8 @@ public class Book
                 case "3":
                     Console.WriteLine();
                     break;
-                case "4":
-                    exit = true;
+                case "0":
+                    exit = false;
                     break;
             }
 

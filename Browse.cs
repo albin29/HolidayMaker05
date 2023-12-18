@@ -53,13 +53,13 @@ public class Browse
             result += "\n";
         }
         Console.WriteLine(result);
-        Console.WriteLine("0 - return\nAny key - Exit");
+        Console.WriteLine("0 - return\nAny other key - Exit");
 
         string? pick = Console.ReadLine();
         switch (pick)
         {
             case "0":
-                await Hotel(";");
+                await Hotel("");
                 break;
             case "7":
                 await Rooms(hotelID, "ORDER BY rooms.price ASC");
@@ -122,6 +122,16 @@ public class Browse
         {
             switch (intID)
             {
+                case 1: await Rooms(intID, "");
+                    break;
+                case 2: await Rooms(intID, "");
+                    break;
+                case 3: await Rooms(intID, "");
+                    break;
+                case 4: await Rooms(intID, "");
+                    break;
+                case 5: await Rooms(intID, "");
+                    break;
                 case 6:
                     await Hotel("\nORDER BY locations.distance_from_beach ASC");
                     break;
@@ -132,8 +142,7 @@ public class Browse
                     await Hotel("\nORDER BY hotels.rating DESC");
                     break;
                 default:
-                    await Rooms(intID, "");
-                    break;
+                    return;
             }
         }
         else

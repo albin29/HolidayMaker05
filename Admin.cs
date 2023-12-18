@@ -28,10 +28,9 @@ public class Admin
             Console.Clear();
             Console.WriteLine("Welcome to our Holidaymaker");
 
-            Console.WriteLine("1 - Booking");
-            Console.WriteLine("2 - Alter room");
-            Console.WriteLine("3 - Browse");
-            Console.WriteLine("4 - Register user\n");
+            Console.WriteLine("1 - Book");
+            Console.WriteLine("2 - Alter");
+            Console.WriteLine("3 - Browse\n");
             Console.WriteLine("0 - Exit menu");
 
             string? pick = Console.ReadLine();
@@ -42,7 +41,6 @@ public class Admin
                 case "2": await alter.Reservation();
                     break;
                 case "3": await browse.Hotel("");
-
                     break;
                 case "0": menu = false;
                     break;

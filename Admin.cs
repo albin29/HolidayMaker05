@@ -42,10 +42,11 @@ public class Admin
             {
                 case "1": await book.Open();
                     break;
-                case "2": await alter.Open();
+                case "2": await alter.Reservation();
                     break;
                 case "3": searchPage.Open();
                     break;
+
                 case "4": await registeruser.RegisterMenu();
                     break;
 

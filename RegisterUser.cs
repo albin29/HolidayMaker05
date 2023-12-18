@@ -31,7 +31,6 @@ public class RegisterUser
         string phoneNumber = Console.ReadLine();
         await RegisterUserAsync(name, lastName, email, phoneNumber);
 
-
     }
 
     public async Task RegisterUserAsync(string name, string lastName, string email, string phoneNumber)

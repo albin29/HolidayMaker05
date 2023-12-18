@@ -83,6 +83,8 @@ public class Book
     }
 
     public void Reservation() {
+
+
         Console.WriteLine("What is the customers information?");
         Console.WriteLine("Which days do you want to reserve?");
         // Visa alla rum som är tillgängliga

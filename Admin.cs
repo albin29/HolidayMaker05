@@ -8,6 +8,7 @@ using Npgsql;
 namespace HolidayMaker05;
 public class Admin
 {
+
     RegisterUser registeruser;
     private readonly NpgsqlDataSource _db;
     Book book;
@@ -45,9 +46,13 @@ public class Admin
                     break;
                 case "3": searchPage.Open();
                     break;
-                case "4":
-                    await registeruser.RegisterMenu();
+
+                case "4": await registeruser.RegisterMenu();
                     break;
+
+                case "5": await book.Book_Customer();
+                    break;
+
                 case "0": menu = false;
                     break;
             }

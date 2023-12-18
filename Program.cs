@@ -160,11 +160,10 @@ async Task ActivateTables()
     (201, 5, 5, 1650, 5),
     (301, 5, 6, 1850, 5);";
 
-    /*
-    await db.CreateCommand(hotelAddonData).ExecuteNonQueryAsync();
-    await db.CreateCommand(locationData).ExecuteNonQueryAsync();
-    await db.CreateCommand(hotelData).ExecuteNonQueryAsync();
-    await db.CreateCommand(roomAddonData).ExecuteNonQueryAsync();
-    await db.CreateCommand(roomData).ExecuteNonQueryAsync();
-    */
+
+    //await db.CreateCommand(hotelAddonData).ExecuteNonQueryAsync();
+    //await db.CreateCommand(locationData).ExecuteNonQueryAsync();
+    //await db.CreateCommand(hotelData).ExecuteNonQueryAsync();
+    //await db.CreateCommand(roomAddonData).ExecuteNonQueryAsync();
+    //await db.CreateCommand(roomData).ExecuteNonQueryAsync();
 }

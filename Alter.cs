@@ -1,6 +1,7 @@
 ﻿using Npgsql;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Security.Cryptography.X509Certificates;
@@ -28,11 +29,11 @@ public class Alter
 
         if (!await Preview(email))
         {
-           return;
+            return;
         }
         Console.WriteLine("What about your reservation would you like to alter?");
         Console.WriteLine("1 - The date\n2 - The room\n3 - Browse\n\n0 - Exit");
-
+        string orderBy = string.Empty;
         string? pick = Console.ReadLine();
 
         switch (pick)
@@ -43,9 +44,10 @@ public class Alter
             case "2":
                 await Room(email);
                 break;
-            case "3": await Browse();
+            case "3":
+                await Hotel(orderBy);
                 break;
-            case "0": 
+            case "0":
                 break;
         }
         //DELETE FROM Customers WHERE CustomerName='Alfreds Futterkiste';
@@ -92,7 +94,7 @@ public class Alter
         await cmd.ExecuteNonQueryAsync();
 
         Console.Clear();
-        Preview(email);
+        await Preview(email);
         Console.ReadKey();
 
     }
@@ -134,16 +136,6 @@ public class Alter
         Console.WriteLine(result);
         return true;
     }
-    public async Task Browse()
-    {
-        await Hotel();
-
-        Console.WriteLine("Which hotel would you like?");
-        int hotelID = Convert.ToInt32(Console.ReadLine());
-
-        await Rooms(hotelID);
-
-    }
     public async Task Rooms(int hotelID)
     {
         Console.Clear();
@@ -153,7 +145,7 @@ public class Alter
         room_addons.jacuzzi, room_addons.smart_tv
         FROM rooms
         LEFT JOIN room_addons ON rooms.room_addon_id = room_addons.room_addon_id
-        WHERE rooms.hotel_id = @hotelid";
+        WHERE rooms.hotel_id = @hotelid;";
         string result = string.Empty;
 
         using var command = _db.CreateCommand(qRooms);
@@ -191,17 +183,17 @@ public class Alter
         Console.ReadKey();
     }
 
-    public async Task Hotel()
+    public async Task Hotel(string orderBy)
     {
         Console.Clear();
 
-        string qHotels = @"
-        SELECT hotels.hotel_id, hotels.name, hotels.rating, locations.distance_from_central,
+        string qHotels = $@"
+        SELECT hotels.hotel_id, hotels.rating, hotels.name, locations.distance_from_central,
         locations.distance_from_beach, hotel_addons.live_performance, 
         hotel_addons.pool, hotel_addons.childrens_club, hotel_addons.restaurant, locations.address
         FROM hotels
         LEFT JOIN locations ON locations.location_id = hotels.location_id
-        LEFT JOIN hotel_addons ON hotel_addons.hotel_addon_id = hotels.hotel_addon_id;";
+        LEFT JOIN hotel_addons ON hotel_addons.hotel_addon_id = hotels.hotel_addon_id{orderBy};";
 
         string result = string.Empty;
 
@@ -209,15 +201,14 @@ public class Alter
 
         var reader = await command.ExecuteReaderAsync();
 
-        Console.WriteLine("ID Name Rating dBeach dCentral LiveP Pool ChildrensC Restaurant Address ");
         while (await reader.ReadAsync())
         {
             result += "[";
             result += reader.GetInt32(0);
+            result += "] ";
+            result += reader.GetInt32(1);
             result += ", ";
-            result += reader.GetString(1);
-            result += ", ";
-            result += reader.GetInt32(2);
+            result += reader.GetString(2);
             result += ", ";
             result += reader.GetFloat(3);
             result += "KM, ";
@@ -232,15 +223,38 @@ public class Alter
             result += reader.GetBoolean(8);
             result += ", ";
             result += reader.GetString(9);
-            result += "]\n";
+            result += "\n";
         }
 
-        if (result == string.Empty)
-        {
-            await Console.Out.WriteLineAsync("Sorry couldn't find a match");
-            Console.ReadKey();
-        }
+        Console.WriteLine("Which hotel would you like to explore?");
+        Console.WriteLine("Rating Name dBeach dCentral LiveP Pool ChildrensC Restaurant Address");
         Console.WriteLine(result);
-               
+        Console.WriteLine("6 - Sort by distance to beach\n7 - Sort by distance to central\n8 - Sort by rating\n\nAny other key - Return");
+
+        int intID;
+        string? stringID = Console.ReadLine();
+
+        if (int.TryParse(stringID, out intID))
+        {
+            switch (intID)
+            {
+                case 6:
+                    orderBy = "\nORDER BY locations.distance_from_beach ASC"; await Hotel(orderBy);
+                    break;
+                case 7:
+                    orderBy = "\nORDER BY locations.distance_from_central ASC"; await Hotel(orderBy);
+                    break;
+                case 8:
+                    orderBy = "\nORDER BY hotels.rating DESC"; await Hotel(orderBy);
+                    break;
+                default:
+                    await Rooms(intID);
+                    break;
+            }
+        }
+        else
+        {
+            return;
+        }
     }
 }

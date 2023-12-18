@@ -57,8 +57,8 @@ public class Alter
         Console.Clear();
         Console.WriteLine("What are the dates you would like to have instead?\nFormat XXXX/XX/XX");
 
-        string startingDate = Console.ReadLine();
-        string endingDate = Console.ReadLine();
+        string? startingDate = Console.ReadLine();
+        string? endingDate = Console.ReadLine();
 
         string qDate = @"
         UPDATE reservations
@@ -136,16 +136,16 @@ public class Alter
         Console.WriteLine(result);
         return true;
     }
-    public async Task Rooms(int hotelID)
+    public async Task Rooms(int hotelID, string query)
     {
         Console.Clear();
 
-        string qRooms = @"
+        string qRooms = $@"
         SELECT rooms.room_id, rooms.number, rooms.beds, price, room_addons.balcony, room_addons.ac,
         room_addons.jacuzzi, room_addons.smart_tv
         FROM rooms
         LEFT JOIN room_addons ON rooms.room_addon_id = room_addons.room_addon_id
-        WHERE rooms.hotel_id = @hotelid;";
+        WHERE rooms.hotel_id = @hotelid{query};";
         string result = string.Empty;
 
         using var command = _db.CreateCommand(qRooms);
@@ -173,16 +173,19 @@ public class Alter
             result += reader.GetBoolean(7);
             result += "\n";
         }
-
-        if (result == string.Empty)
-        {
-            await Console.Out.WriteLineAsync("Sorry couldn't find a match");
-            Console.ReadKey();
-        }
         Console.WriteLine(result);
-        Console.ReadKey();
-    }
+        Console.WriteLine("0 - return\nAny key - Exit");
 
+        string? pick = Console.ReadLine();
+        switch (pick)
+        {
+            case "0": await Hotel(";");
+                break;
+            case "7": await Rooms(hotelID, "ORDER BY rooms.price ASC");
+                break;
+            default: return;
+        }
+    }
     public async Task Hotel(string orderBy)
     {
         Console.Clear();
@@ -248,7 +251,7 @@ public class Alter
                     orderBy = "\nORDER BY hotels.rating DESC"; await Hotel(orderBy);
                     break;
                 default:
-                    await Rooms(intID);
+                    await Rooms(intID, "");
                     break;
             }
         }

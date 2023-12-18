@@ -39,16 +39,14 @@ public class Admin
             string pick = Console.ReadLine();
             switch (pick)
             {
-                case "1": book.Open();
+                case "1": await book.Open();
                     break;
-                case "2": await alter.Open();
+                case "2": await alter.Reservation();
                     break;
                 case "3": searchPage.Open();
                     break;
                 case "4":
                     await registeruser.RegisterMenu();
-
-
                     break;
                 case "0": menu = false;
                     break;

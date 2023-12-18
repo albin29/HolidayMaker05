@@ -31,11 +31,12 @@ public class Browse
         command.Parameters.AddWithValue("hotelid", hotelID);
 
         var reader = await command.ExecuteReaderAsync();
+        string header = "ID Number Beds Price    Blcny AC  Jacuz SmartTV";
+        string divider = new string('-', header.Length);
 
-        Console.WriteLine("ID Number Beds Price Balcony AC Jacuzzi SmartTV");
         while (await reader.ReadAsync())
         {
-            result += reader.GetInt32(0);
+            result += reader.GetInt32(0).ToString("").PadRight(2);
             result += " | ";
             result += reader.GetInt32(1);
             result += " | ";
@@ -52,8 +53,11 @@ public class Browse
             result += reader.GetBoolean(7);
             result += "\n";
         }
+
+        Console.WriteLine($"{divider}\n{header}\n{divider}");
+
         Console.WriteLine(result);
-        Console.WriteLine("0 - return\nAny other key - Exit");
+        Console.WriteLine("1 - Order by price\n\n0 - return\nAny other key - Exit");
 
         string? pick = Console.ReadLine();
         switch (pick)
@@ -61,8 +65,8 @@ public class Browse
             case "0":
                 await Hotel("");
                 break;
-            case "7":
-                await Rooms(hotelID, "ORDER BY rooms.price ASC");
+            case "1":
+                await Rooms(hotelID, "\nORDER BY rooms.price ASC");
                 break;
             default: return;
         }
@@ -85,33 +89,35 @@ public class Browse
 
         var reader = await command.ExecuteReaderAsync();
 
+        string header = " Rating  Name       dBeach    dCentral  LiveP Pool  cClub Diner Address";
+        string divider = new string('-', header.Length);
+
         while (await reader.ReadAsync())
         {
             result += "[";
             result += reader.GetInt32(0);
             result += "] ";
             result += reader.GetInt32(1);
-            result += ", ";
-            result += reader.GetString(2);
-            result += ", ";
-            result += reader.GetFloat(3);
-            result += "KM, ";
-            result += reader.GetFloat(4);
-            result += "KM, ";
-            result += reader.GetBoolean(5);
-            result += ", ";
-            result += reader.GetBoolean(6);
-            result += ", ";
-            result += reader.GetBoolean(7);
-            result += ", ";
-            result += reader.GetBoolean(8);
-            result += ", ";
+            result += "  ";
+            result += reader.GetString(2).PadRight(11);
+            result += reader.GetFloat(3).ToString("F1").PadLeft(6);
+            result += "KM   ";
+            result += reader.GetFloat(4).ToString("F1").PadLeft(6);
+            result += "KM   ";
+            result += reader.GetBoolean(5) ? "True " : "False";
+            result += " ";
+            result += reader.GetBoolean(6) ? "True " : "False";
+            result += " ";
+            result += reader.GetBoolean(7) ? "True " : "False";
+            result += " ";
+            result += reader.GetBoolean(8) ? "True " : "False";
+            result += " ";
             result += reader.GetString(9);
             result += "\n";
         }
 
-        Console.WriteLine("Which hotel would you like to explore?");
-        Console.WriteLine("Rating Name dBeach dCentral LiveP Pool ChildrensC Restaurant Address");
+        Console.WriteLine("Which hotel would you like to explore?\n");
+        Console.WriteLine($"{divider}\n{header}\n{divider}");
         Console.WriteLine(result);
         Console.WriteLine("6 - Sort by distance to beach\n7 - Sort by distance to central\n8 - Sort by rating\n\nAny other key - Return");
 

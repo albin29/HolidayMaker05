@@ -42,6 +42,7 @@ public class Admin
                 case "2": await alter.Reservation();
                     break;
                 case "3": await browse.Hotel("");
+
                     break;
                 case "0": menu = false;
                     break;

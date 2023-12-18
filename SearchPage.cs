@@ -59,6 +59,7 @@ public class SearchPage
             result += reader.GetInt32(0);
             result += ", ";
             result += reader.GetString(1);
+            
         }
         return result;
 

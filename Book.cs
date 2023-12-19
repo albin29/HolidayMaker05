@@ -1,6 +1,7 @@
 ﻿using Npgsql;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Channels;
@@ -36,7 +37,7 @@ public class Book
                     await Reservation();
                     break;
                 case "2":
-                    await Book_Customer();
+                    
                     break;
                 case "3":
                     Console.WriteLine();
@@ -50,22 +51,7 @@ public class Book
 
     }
 
-    public async Task Book_Customer()
-    {
-        Console.WriteLine("What is the customers full name?");
-        string? full_name = Console.ReadLine();
-        Console.WriteLine("What is the userEmail?");
-        string? email = Console.ReadLine();
-        Console.WriteLine("What room to be reserved?");
-        string? room_id = Console.ReadLine();
-        Console.WriteLine("What is the startingDate ?");
-        string? starting_date = Console.ReadLine();
-        Console.WriteLine("What is the endingDate ?");
-        string? ending_date = Console.ReadLine();
-        await RegisterReservation(Convert.ToInt32(room_id), full_name, email, starting_date, ending_date);
-    }
-
-    public async Task RegisterReservation(int room_id, string full_name, string email, string starting_date, string ending_date)
+    public async Task RegisterReservation(string room_id, string full_name, string email, string starting_date, string ending_date)
     {
         string insertQuery = @"
         INSERT INTO reservations (room_id, full_name,email, starting_date, ending_date)
@@ -73,7 +59,7 @@ public class Book
 
         await using var cmd = _db.CreateCommand(insertQuery);
 
-        cmd.Parameters.AddWithValue("room_id", room_id);
+        cmd.Parameters.AddWithValue("room_id", Convert.ToInt32(room_id));
         cmd.Parameters.AddWithValue("full_name", full_name);
         cmd.Parameters.AddWithValue("email", email);
         cmd.Parameters.AddWithValue("starting_date", DateTime.Parse(starting_date));
@@ -82,34 +68,82 @@ public class Book
         await cmd.ExecuteNonQueryAsync();
     }
 
-    public async Task Reservation() {
+    public async Task Reservation()
+    {
+        while (true)
+        {
+            Console.Clear();
+            Console.WriteLine("What is the customers full name?");
+            string? fullName = Console.ReadLine();
+            Console.Clear();
+            Console.WriteLine("What is your email?");
+            string? email = Console.ReadLine();
+            Console.Clear();
+            Console.WriteLine("Which hotel would you like to stay at?");
+            string? hotelID = Console.ReadLine();
+            if (Convert.ToInt32(hotelID) > 5 || Convert.ToInt32(hotelID) < 0)
+            {
+                Console.WriteLine("Invalid hotel ID");
+                Console.ReadKey();
+                break;
+            }
+            Console.Clear();
+            Console.WriteLine("Which dates would you like to stay? [xxxx/xx/xx]");
+            string? startingDate = Console.ReadLine();
+            string? endingDate = Console.ReadLine();
+            await ReserveQueries(startingDate, endingDate, hotelID);
+            Console.WriteLine("Enter room ID");
+            string? roomID = Console.ReadLine();
+            Console.Clear();
 
-
-        Console.WriteLine("What is the customers information?");
-        Console.WriteLine("Which days do you want to reserve?");
-        // Visa alla rum som är tillgängliga
-        Console.WriteLine("Which hotel would you like to stay at?");
-        //Print all hotels
-        //customer väljer ett hotell
-        Console.WriteLine("How many beds would you like?");
-        //show all rooms with amounts of bed
-         
-        Console.WriteLine("Would you like to have any addons?");
-        // visa alla rum med kundens filter
-        
-        // boka in
-
-
-
-
-
-
-
-
+            await RegisterReservation(roomID, fullName, email, startingDate, endingDate);
+            Console.WriteLine("Your reservation was successful! ");
+            Console.ReadKey();
+            break;
+        }
     }
+    public async Task ReserveQueries(string startingDate, string endingDate, string hotelID)
+    {
 
 
+        string insertQuery = $@"
+        SELECT r.room_id, r.number, r.beds, r.price, ra.balcony, ra.ac, ra.jacuzzi, ra.smart_tv
+        FROM rooms r
+        LEFT JOIN room_addons ra ON r.room_addon_id = ra.room_addon_id
+        WHERE r.hotel_ID = {hotelID}  and r.room_id NOT IN (
+        SELECT res.room_id
+        FROM reservations res
+        WHERE res.starting_date BETWEEN '{startingDate}'::date AND '{endingDate}'::date
+        OR res.ending_date BETWEEN '{startingDate}'::date AND '{endingDate}'::date);";
 
+        await using var cmd = _db.CreateCommand(insertQuery);
+        var reader = await cmd.ExecuteReaderAsync();
 
-
+        string result = string.Empty;
+        string header = "RoomID Number Beds Price Balcony AC Jacuzzi SmartTV";
+        string divider = new string('-', header.Length);
+        while (await reader.ReadAsync())
+        {
+            result += "[";
+            result += reader.GetInt32(0).ToString("").PadRight(2);
+            result += " ]  ";
+            result += reader.GetInt32(1).ToString("").PadLeft(2);
+            result += " ";
+            result += reader.GetInt32(2).ToString("").PadLeft(4);
+            result += "   ";
+            result += reader.GetInt32(3).ToString("").PadLeft(4);
+            result += "    ";
+            result += reader.GetBoolean(4) ? "True " : "False";
+            result += " ";
+            result += reader.GetBoolean(5) ? "True " : "False";
+            result += " ";
+            result += reader.GetBoolean(6) ? "True " : "False";
+            result += " ";
+            result += reader.GetBoolean(7) ? "True " : "False";
+            result += "\n";
+            // 4,5
+        }
+        Console.WriteLine($"{divider}\n{header}\n{divider}");
+        Console.WriteLine(result);
+    }
 }

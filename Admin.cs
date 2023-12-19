@@ -11,17 +11,14 @@ public class Admin
     private readonly NpgsqlDataSource _db;
     Book book;
     Alter alter;
-    SearchPage searchPage;
-    Hotel hotel;
-    
+    Browse browse;
 
     public Admin(NpgsqlDataSource db)
     {
         _db = db;
         book = new Book(db);
         alter = new Alter(db);
-        searchPage = new SearchPage(db);
-        hotel = new Hotel(db);   
+        browse = new Browse(db);
     }
     public async Task Menu()
     {
@@ -31,21 +28,19 @@ public class Admin
             Console.Clear();
             Console.WriteLine("Welcome to our Holidaymaker");
 
-            Console.WriteLine("1 - Booking");
-            Console.WriteLine("2 - Alter room");
-            Console.WriteLine("3 - Searches");
-            Console.WriteLine("4-  hotel");
-
+            Console.WriteLine("1 - Book");
+            Console.WriteLine("2 - Alter");
+            Console.WriteLine("3 - Browse\n");
             Console.WriteLine("0 - Exit menu");
 
-            string pick = Console.ReadLine();
+            string? pick = Console.ReadLine();
             switch (pick)
             {
-                case "1": book.Open();
+                case "1": await book.Open();
                     break;
-                case "2": await alter.Open();
+                case "2": await alter.Reservation();
                     break;
-                case "3": searchPage.Open();
+                case "3": await browse.Hotel("");
                     break;
                 case "4":  await hotel.Search();
                     break;

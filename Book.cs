@@ -1,5 +1,6 @@
 ﻿using Npgsql;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -15,6 +16,7 @@ public class Book
     public Book(NpgsqlDataSource db)
     {
         _db = db;
+
     }
     public async Task Open()
     {
@@ -37,7 +39,7 @@ public class Book
                     await Reservation();
                     break;
                 case "2":
-                    
+
                     break;
                 case "3":
                     Console.WriteLine();
@@ -46,11 +48,8 @@ public class Book
                     exit = false;
                     break;
             }
-
         }
-
     }
-
     public async Task RegisterReservation(string room_id, string full_name, string email, string starting_date, string ending_date)
     {
         string insertQuery = @"
@@ -70,7 +69,8 @@ public class Book
 
     public async Task Reservation()
     {
-        while (true)
+        bool reservation = true;
+        while (reservation)
         {
             Console.Clear();
             Console.WriteLine("What is the customers full name?");
@@ -94,14 +94,32 @@ public class Book
             await ReserveQueries(startingDate, endingDate, hotelID);
             Console.WriteLine("Enter room ID");
             string? roomID = Console.ReadLine();
-            Console.Clear();
 
-            await RegisterReservation(roomID, fullName, email, startingDate, endingDate);
-            Console.WriteLine("Your reservation was successful! ");
-            Console.ReadKey();
-            break;
+
+            string query = $"select room_id from rooms where room_id = {roomID} and hotel_id = {hotelID}";
+            var cmd = _db.CreateCommand(query);
+            cmd.Parameters.AddWithValue(int.Parse(roomID));
+            cmd.Parameters.AddWithValue(int.Parse(hotelID));
+            var count = await cmd.ExecuteReaderAsync();
+            while (await count.ReadAsync())
+            {
+                if (count.GetInt32(0) == int.Parse(roomID))
+                {
+                    await RegisterReservation(roomID, fullName, email, startingDate, endingDate);
+                    Console.WriteLine("Your reservation was successful! ");
+                    Console.ReadKey();
+                    reservation = false;
+
+                }
+            }
+            if (reservation)
+            {
+                Console.WriteLine("Invalid combo of room and hotel id");
+                Console.ReadKey();
+            }
         }
     }
+
     public async Task ReserveQueries(string startingDate, string endingDate, string hotelID)
     {
 

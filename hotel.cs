@@ -13,16 +13,13 @@ public class Hotel
 {
     private readonly NpgsqlDataSource _db;
 
-    public Hotel(NpgsqlDataSource db )
-     {
+    public Hotel(NpgsqlDataSource db)
+    {
 
 
-    _db=db;
-      
+        _db = db;
+    }
 
-
-      }
-       
     public async Task Search()
     {
         string query = @"
@@ -31,9 +28,6 @@ public class Hotel
         SELECT name, location
         FROM hotels
         WHERE hotel_id = 2;";
-
-        
-         
 
 
         string result = string.Empty;
@@ -48,12 +42,12 @@ public class Hotel
             result += reader.GetString(2);
         }
         Console.WriteLine(result);
-        
+
         Console.ReadKey();
 
     }
 
 
-}   
-       
-   
+}
+
+

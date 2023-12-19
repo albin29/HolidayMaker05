@@ -48,6 +48,7 @@ public class Hotel
             result += reader.GetString(2);
         }
         Console.WriteLine(result);
+        
         Console.ReadKey();
 
     }

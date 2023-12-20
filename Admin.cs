@@ -36,7 +36,7 @@ public class Admin
             string? pick = Console.ReadLine();
             switch (pick)
             {
-                case "1": await book.Open();
+                case "1": await book.Reservation();
                     break;
                 case "2": await alter.Reservation();
                     break;

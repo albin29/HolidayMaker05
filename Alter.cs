@@ -8,6 +8,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace HolidayMaker05;
 
@@ -32,7 +33,7 @@ public class Alter
             return;
         }
         Console.WriteLine("What about your reservation would you like to alter?");
-        Console.WriteLine("1 - The date\n2 - The room\n\n0 - Exit");
+        Console.WriteLine("1 - The date\n2 - The room\n3 - Delete reservation\n0 - Exit");
         string orderBy = string.Empty;
         string? pick = Console.ReadLine();
 
@@ -44,15 +45,59 @@ public class Alter
             case "2":
                 await Room(email);
                 break;
+            case "3":
+                await Delete(email);
+                break;
             case "0":
                 break;
         }
-        //DELETE FROM Customers WHERE CustomerName='Alfreds Futterkiste';
+    }
+    public async Task Delete(string email)
+    {
+        string qDelete = @"
+        DELETE 
+        FROM reservations
+        WHERE email = @email;";
+
+        await using var cmd = _db.CreateCommand(qDelete);
+        cmd.Parameters.AddWithValue("email", email);
+        await cmd.ExecuteNonQueryAsync();
+
+
+        Console.Clear();
+        Console.WriteLine($"Reservation with {email} is deleted");
+        Console.ReadKey();
+
     }
     public async Task Date(string email)
     {
         Console.Clear();
+        Console.WriteLine("Enter room ID");
+        int? roomID = int.Parse(Console.ReadLine());
+        Console.Clear();
         Console.WriteLine("What are the dates you would like to have instead?\nFormat XXXX/XX/XX");
+
+        string qOccupied = @"
+        SELECT starting_date, ending_date
+        FROM reservations
+        WHERE room_id = @roomID";
+
+        string result = string.Empty;
+
+        using var command = _db.CreateCommand(qOccupied);
+        command.Parameters.AddWithValue("roomID", roomID);
+
+        var reader = await command.ExecuteReaderAsync();
+        Console.WriteLine();
+        while (await reader.ReadAsync())
+        {
+            result += reader.GetDateTime(0);
+            result += " - ";
+            result += reader.GetDateTime(1);
+            result += "\n";
+        }
+
+        Console.WriteLine(result);
 
         string? startingDate = Console.ReadLine();
         string? endingDate = Console.ReadLine();
@@ -74,9 +119,34 @@ public class Alter
     public async Task Room(string email)
     {
         Console.Clear();
-        Console.WriteLine("What room did you want instead?");
+        Console.WriteLine("Enter room ID");
+        int? roomID = int.Parse(Console.ReadLine());
+        Console.Clear();
 
-        int room = Convert.ToInt32(Console.ReadLine());
+        string qOccupied = @"
+        SELECT starting_date, ending_date
+        FROM reservations
+        WHERE room_id = @roomID";
+
+        string result = string.Empty;
+
+        using var command = _db.CreateCommand(qOccupied);
+        command.Parameters.AddWithValue("roomID", roomID);
+
+        var reader = await command.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
+        {
+            result += reader.GetDateTime(0);
+            result += " - ";
+            result += reader.GetDateTime(1);
+            result += "\n";
+        }
+        await Preview(email);
+        Console.WriteLine();
+        Console.WriteLine(result);
+
+        Console.WriteLine("Enter room ID");
+        int room = int.Parse(Console.ReadLine());
 
         string qRoom = @"
         UPDATE reservations
@@ -133,4 +203,4 @@ public class Alter
         Console.WriteLine(result);
         return true;
     }
- }
+}

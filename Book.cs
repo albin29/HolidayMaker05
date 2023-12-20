@@ -18,38 +18,6 @@ public class Book
         _db = db;
 
     }
-    public async Task Open()
-    {
-        bool exit = true;
-        while (exit)
-        {
-            Console.Clear();
-            Console.WriteLine("What would you like to book?");
-
-            Console.WriteLine("1 - Make a full reservation");
-            Console.WriteLine("2 - Book a customer by name and room id");
-            Console.WriteLine("3 - Unknown");
-
-            Console.WriteLine("0 - Exit");
-
-            switch (Console.ReadLine())
-            {
-                case "1":
-                    Console.WriteLine("");
-                    await Reservation();
-                    break;
-                case "2":
-
-                    break;
-                case "3":
-                    Console.WriteLine();
-                    break;
-                case "0":
-                    exit = false;
-                    break;
-            }
-        }
-    }
     public async Task RegisterReservation(string room_id, string full_name, string email, string starting_date, string ending_date)
     {
         string insertQuery = @"
@@ -63,10 +31,8 @@ public class Book
         cmd.Parameters.AddWithValue("email", email);
         cmd.Parameters.AddWithValue("starting_date", DateTime.Parse(starting_date));
         cmd.Parameters.AddWithValue("ending_date", DateTime.Parse(ending_date));
-
         await cmd.ExecuteNonQueryAsync();
     }
-
     public async Task Reservation()
     {
         bool reservation = true;
@@ -94,8 +60,6 @@ public class Book
             await ReserveQueries(startingDate, endingDate, hotelID);
             Console.WriteLine("Enter room ID");
             string? roomID = Console.ReadLine();
-
-
             string query = $"select room_id from rooms where room_id = {roomID} and hotel_id = {hotelID}";
             var cmd = _db.CreateCommand(query);
             cmd.Parameters.AddWithValue(int.Parse(roomID));
@@ -109,7 +73,6 @@ public class Book
                     Console.WriteLine("Your reservation was successful! ");
                     Console.ReadKey();
                     reservation = false;
-
                 }
             }
             if (reservation)
@@ -119,11 +82,8 @@ public class Book
             }
         }
     }
-
     public async Task ReserveQueries(string startingDate, string endingDate, string hotelID)
     {
-
-
         string insertQuery = $@"
         SELECT r.room_id, r.number, r.beds, r.price, ra.balcony, ra.ac, ra.jacuzzi, ra.smart_tv
         FROM rooms r
@@ -133,10 +93,8 @@ public class Book
         FROM reservations res
         WHERE res.starting_date BETWEEN '{startingDate}'::date AND '{endingDate}'::date
         OR res.ending_date BETWEEN '{startingDate}'::date AND '{endingDate}'::date);";
-
         await using var cmd = _db.CreateCommand(insertQuery);
         var reader = await cmd.ExecuteReaderAsync();
-
         string result = string.Empty;
         string header = "RoomID Number Beds Price Balcony AC Jacuzzi SmartTV";
         string divider = new string('-', header.Length);

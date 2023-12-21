@@ -91,9 +91,9 @@ public class Alter
         Console.WriteLine();
         while (await reader.ReadAsync())
         {
-            result += reader.GetDateTime(0);
+            result += reader.GetDateTime(0).ToShortDateString();
             result += " - ";
-            result += reader.GetDateTime(1);
+            result += reader.GetDateTime(1).ToShortDateString();
             result += "\n";
         }
 
@@ -188,9 +188,9 @@ public class Alter
             result += ", ";
             result += reader.GetString(2);
             result += ", ";
-            result += reader.GetDateTime(3);
+            result += reader.GetDateTime(3).ToShortDateString();
             result += ", ";
-            result += reader.GetDateTime(4);
+            result += reader.GetDateTime(4).ToShortDateString();
             result += "\n";
         }
 
